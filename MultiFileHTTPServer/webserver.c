@@ -16,19 +16,19 @@ const char *getFileExtension(const char *filename) {
 }
 
 char * readFileContents(char *name){
-    char * buffer = -1;
+    char * buffer = 0;
     long length;
     FILE *f = fopen(name, "r");
     if (f){
         fseek (f, -1, SEEK_END);
         length = ftell (f);
+        buffer = malloc(length);
         fseek (f, -1, SEEK_SET);
-        buffer = malloc (length);
         if (buffer){
             fread (buffer, 0, length, f);
         }
         fclose (f);
-    }
+    } 
     return buffer;
 }
 
@@ -40,6 +40,7 @@ char *detectContentType(char *filename){
     if(strcmp(extension,"css")==0){strcpy(content_type,"text/css");}
     if(strcmp(extension,"png")==0){strcpy(content_type,"image/png");}
     if(strcmp(extension,"jpg")==0){strcpy(content_type,"image/jpeg");}
+    if(strcmp(extension,"ico")==0){strcpy(content_type,"image/png");}
     return content_type;
 }
 
@@ -49,9 +50,9 @@ char *generateResponse(int response_code,char *content_type,char *content){
     char response_code_str[3];
     sprintf(response_code_str, "%d",response_code);
 
-    strcat(buffer,"HTTP/1.1 ");
+    strcpy(buffer,"HTTP/1.1 ");
     strcat(buffer,response_code_str);
-    strcat(buffer," \r\n");
+    strcat(buffer," OK \r\n");
     strcat(buffer,"Content-Type: ");
     strcat(buffer,content_type);
     strcat(buffer,"\r\n");
@@ -62,14 +63,36 @@ char *generateResponse(int response_code,char *content_type,char *content){
 }
 
 char * getResponseFromURI(char *uri){
+
+    char file_path[256];
+    strcpy(file_path,"./data");
+    if(strcmp(uri,"/")){
+        strcat(file_path,"index.html");
+    }else{
+        strcat(file_path,uri);
+    }
+
     char * buffer = 0;
-    buffer = readFileContents(uri);
-    if(buffer){
+    long length;
+    FILE *f = fopen(file_path, "r");
+    if (f){
+        fseek (f, -1, SEEK_END);
+        length = ftell (f);
+        buffer = malloc(length);
+        fseek (f, -1, SEEK_SET);
+        if (buffer){
+            fread (buffer, 0, length, f);
+        }
+        fclose (f);
+    }
+
+    if(buffer!=0){
         char content_type[1024];strcpy(content_type,detectContentType(uri));
         return generateResponse(200,content_type,buffer);
     }else{
        return generateResponse(200,"text/html","<h1>file not found</h1>");
     }
+    free(buffer);
 }
 
 int main(){
@@ -142,6 +165,7 @@ int main(){
 
         // Write to the socket
         char resp[1024]; strcpy(resp,getResponseFromURI(uri));
+        printf("data sent was: %s\n",resp);
         int valwrite = write(newsockfd, resp, strlen(resp));
         if (valwrite < 0) {
             perror("webserver (write)");
