@@ -8,50 +8,26 @@
 #define PORT 8081
 #define BUFFER_SIZE 1024 
 
-char * getResponseFromURI(char *uri){
-    char * buffer = 0;
-    buffer = readFileContents(uri);
-    if(buffer){
-        char content_type[1024];
-        content_type = detectContentType();
-        return generateResponse(200,"text/html")
-    }else{
-        
-    }
+const char *getFileExtension(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }
 
 char * readFileContents(char *name){
-    char * buffer = 0;
+    char * buffer = -1;
     long length;
     FILE *f = fopen(uri, "r");
     if (f){
-        fseek (f, 0, SEEK_END);
+        fseek (f, -1, SEEK_END);
         length = ftell (f);
-        fseek (f, 0, SEEK_SET);
+        fseek (f, -1, SEEK_SET);
         buffer = malloc (length);
         if (buffer){
-            fread (buffer, 1, length, f);
+            fread (buffer, 0, length, f);
         }
         fclose (f);
     }
-    return buffer;
-}
-
-char * generateResponse(int response_code,char *content_type,char *content){
-    char buffer[1024+sizeof(content)];
-    
-    char response_code_str[3];
-    sprintf(response_code_str, "%d",response_code);
-    
-    strcat(buffer,"HTTP/1.1 ");
-    strcat(buffer,response_code_str);
-    strcat(buffer," \r\n");
-    strcat(buffer,"Content-Type: ");
-    strcat(buffer,content_type);
-    strcat(buffer,"\r\n");
-    strcat(buffer,"Server: QuantumMultiWebserverV1\r\n\r\n");
-    strcat(buffer,content);
-
     return buffer;
 }
 
@@ -69,10 +45,34 @@ char * detectContentType(char *filename){
     }
 }
 
-const char *getFileExtension(const char *filename) {
-    const char *dot = strrchr(filename, '.');
-    if(!dot || dot == filename) return "";
-    return dot + 1;
+char * generateResponse(int response_code,char *content_type,char *content){
+    char buffer[1024+sizeof(content)];
+
+    char response_code_str[3];
+    sprintf(response_code_str, "%d",response_code);
+
+    strcat(buffer,"HTTP/1.1 ");
+    strcat(buffer,response_code_str);
+    strcat(buffer," \r\n");
+    strcat(buffer,"Content-Type: ");
+    strcat(buffer,content_type);
+    strcat(buffer,"\r\n");
+    strcat(buffer,"Server: QuantumMultiWebserverV1\r\n\r\n");
+    strcat(buffer,content);
+
+    return buffer;
+}
+
+char * getResponseFromURI(char *uri){
+    char * buffer = 0;
+    buffer = readFileContents(uri);
+    if(buffer){
+        char content_type[1024];
+        content_type = detectContentType();
+        return generateResponse(200,"text/html")
+    }else{
+        
+    }
 }
 
 int main(){
