@@ -68,7 +68,7 @@ char * getResponseFromURI(char *uri){
         char content_type[1024];strcpy(content_type,detectContentType(uri));
         return generateResponse(200,content_type,buffer);
     }else{
-       return generateResponse(200,"text/html","<h1>file not found</h1>")
+       return generateResponse(200,"text/html","<h1>file not found</h1>");
     }
 }
 
