@@ -32,22 +32,19 @@ char * readFileContents(char *name){
     return buffer;
 }
 
-char * detectContentType(char *filename){
+char *detectContentType(char *filename){
     char extension[16]; strcpy(extension,getFileExtension(filename));
-    char content_type[32];
-    switch(extension){
-        case "html": strcpy(content_type,"text/html");break;
-        case "js": strcpy(content_type,"text/javascript");break;
-        case "png": strcpy(content_type,"image/png");break;
-        case "jpg": strcpy(content_type,"image/jpg");break;
-        case "jepg": strcpy(content_type,"image/jpg");break;
-        case "css": strcpy(content_type,"text/css");break;
-        default: strcpy(content_type,"text/plain");break;
-    }
+    static char content_type[32]; strcpy(content_type,"text/plain");
+    if(strcmp(extension,"html")==0){strcpy(content_type,"text/html");}
+    if(strcmp(extension,"js")==0){strcpy(content_type,"text/javascript");}
+    if(strcmp(extension,"css")==0){strcpy(content_type,"text/css");}
+    if(strcmp(extension,"png")==0){strcpy(content_type,"image/png");}
+    if(strcmp(extension,"jpg")==0){strcpy(content_type,"image/jpeg");}
+    return content_type;
 }
 
-char * generateResponse(int response_code,char *content_type,char *content){
-    char buffer[1024+sizeof(content)];
+char *generateResponse(int response_code,char *content_type,char *content){
+    static char buffer[1024+sizeof(content)];
 
     char response_code_str[3];
     sprintf(response_code_str, "%d",response_code);
