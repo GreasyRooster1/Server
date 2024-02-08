@@ -6,25 +6,17 @@
 #include <unistd.h>
 
 #define PORT 8081
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 1024 
 
 char * getResponseFromURI(char *uri){
     char * buffer = 0;
-    long length;
-    FILE *fp = fopen(uri, "r");
-    if (fp != NULL){
-        if (f){
-            fseek (f, 0, SEEK_END);
-            length = ftell (f);
-            fseek (f, 0, SEEK_SET);
-            buffer = malloc (length);
-            if (buffer){
-                fread (buffer, 1, length, f);
-            }
-         fclose (f);
-        }
+    buffer = readFileContents(uri);
+    if(buffer){
+        char content_type[1024];
+        content_type = detectContentType();
+        return generateResponse(200,"text/html")
     }else{
-    
+        
     }
 }
 
@@ -43,6 +35,44 @@ char * readFileContents(char *name){
         fclose (f);
     }
     return buffer;
+}
+
+char * generateResponse(int response_code,char *content_type,char *content){
+    char buffer[1024+sizeof(content)];
+    
+    char response_code_str[3];
+    sprintf(response_code_str, "%d",response_code);
+    
+    strcat(buffer,"HTTP/1.1 ");
+    strcat(buffer,response_code_str);
+    strcat(buffer," \r\n");
+    strcat(buffer,"Content-Type: ");
+    strcat(buffer,content_type);
+    strcat(buffer,"\r\n");
+    strcat(buffer,"Server: QuantumMultiWebserverV1\r\n\r\n");
+    strcat(buffer,content);
+
+    return buffer;
+}
+
+char * detectContentType(char *filename){
+    char extension[16]; extension = getFileExtension(filename);
+    char content_type[32];
+    switch(extension){
+        case "html": content_type = "text/html";break;
+        case "js": content_type = "text/javascript";break;
+        case "png": content_type = "image/png";break;
+        case "jpg": content_type = "image/jpg";break;
+        case "jepg": content_type = "image/jpg";break;
+        case "css": content_type = "text/css";break;
+        default: content_type = "text/plain";break;
+    }
+}
+
+const char *getFileExtension(const char *filename) {
+    const char *dot = strrchr(filename, '.');
+    if(!dot || dot == filename) return "";
+    return dot + 1;
 }
 
 int main(){
