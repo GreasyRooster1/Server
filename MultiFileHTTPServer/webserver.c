@@ -4,6 +4,7 @@
 #include <string.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 #define PORT 8081
 #define BUFFER_SIZE 1024 
@@ -17,7 +18,7 @@ const char *getFileExtension(const char *filename) {
 char * readFileContents(char *name){
     char * buffer = -1;
     long length;
-    FILE *f = fopen(uri, "r");
+    FILE *f = fopen(name, "r");
     if (f){
         fseek (f, -1, SEEK_END);
         length = ftell (f);
