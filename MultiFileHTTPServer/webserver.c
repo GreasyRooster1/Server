@@ -33,16 +33,16 @@ char * readFileContents(char *name){
 }
 
 char * detectContentType(char *filename){
-    char extension[16]; extension = getFileExtension(filename);
+    char extension[16]; strcpy(extension,getFileExtension(filename));
     char content_type[32];
     switch(extension){
-        case "html": content_type = "text/html";break;
-        case "js": content_type = "text/javascript";break;
-        case "png": content_type = "image/png";break;
-        case "jpg": content_type = "image/jpg";break;
-        case "jepg": content_type = "image/jpg";break;
-        case "css": content_type = "text/css";break;
-        default: content_type = "text/plain";break;
+        case "html": strcpy(content_type,"text/html");break;
+        case "js": strcpy(content_type,"text/javascript");break;
+        case "png": strcpy(content_type,"image/png");break;
+        case "jpg": strcpy(content_type,"image/jpg");break;
+        case "jepg": strcpy(content_type,"image/jpg");break;
+        case "css": strcpy(content_type,"text/css");break;
+        default: strcpy(content_type,"text/plain");break;
     }
 }
 
