@@ -18,13 +18,14 @@ const char *getFileExtension(const char *filename) {
 
 char *detectContentType(char *filename){
     char extension[16]; strcpy(extension,getFileExtension(filename));
-    static char content_type[32]; strcpy(content_type,"text/plain");
+    static char content_type[32]; //strcpy(content_type,"text/plain");
     if(strcmp(extension,"html")==0){strcpy(content_type,"text/html");}
     if(strcmp(extension,"js")==0){strcpy(content_type,"text/javascript");}
     if(strcmp(extension,"css")==0){strcpy(content_type,"text/css");}
     if(strcmp(extension,"png")==0){strcpy(content_type,"image/png");}
     if(strcmp(extension,"jpg")==0){strcpy(content_type,"image/jpeg");}
     if(strcmp(extension,"ico")==0){strcpy(content_type,"image/png");}
+    //printf(RED "%s", content_type);
     return content_type;
 }
 
