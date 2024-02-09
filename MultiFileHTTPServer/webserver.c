@@ -15,23 +15,6 @@ const char *getFileExtension(const char *filename) {
     return dot + 1;
 }
 
-char * readFileContents(char *name){
-    char * buffer = 0;
-    long length;
-    FILE *f = fopen(name, "r");
-    if (f){
-        fseek (f, -1, SEEK_END);
-        length = ftell (f);
-        buffer = malloc(length);
-        fseek (f, -1, SEEK_SET);
-        if (buffer){
-            fread (buffer, 0, length, f);
-        }
-        fclose (f);
-    } 
-    return buffer;
-}
-
 char *detectContentType(char *filename){
     char extension[16]; strcpy(extension,getFileExtension(filename));
     static char content_type[32]; strcpy(content_type,"text/plain");
@@ -66,32 +49,35 @@ char * getResponseFromURI(char *uri){
 
     char file_path[256];
     strcpy(file_path,"./data");
-    if(strcmp(uri,"/")){
-        strcat(file_path,"index.html");
+    if(strcmp(uri,"/")==0){
+        strcat(file_path,"/index.html");
     }else{
         strcat(file_path,uri);
     }
+    
+    printf("filename: %s\n\n",file_path);
 
-    char * buffer = 0;
+    //load data from file
+    char * buffer=0;
     long length;
-    FILE *f = fopen(file_path, "r");
+    FILE *f = fopen(file_path, "rb");
     if (f){
-        fseek (f, -1, SEEK_END);
+        fseek (f, 0, SEEK_END);
         length = ftell (f);
-        buffer = malloc(length);
-        fseek (f, -1, SEEK_SET);
+        fseek (f, 0, SEEK_SET);
+        buffer = malloc (length);
         if (buffer){
-            fread (buffer, 0, length, f);
+            fread (buffer, 1, length, f);
         }
         fclose (f);
     }
-
-    if(buffer!=0){
+    if(buffer){
         char content_type[1024];strcpy(content_type,detectContentType(uri));
         return generateResponse(200,content_type,buffer);
     }else{
        return generateResponse(200,"text/html","<h1>file not found</h1>");
     }
+    
     free(buffer);
 }
 
